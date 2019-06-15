@@ -38,7 +38,7 @@ function weightKeys(assoc){
   var ret = [];
   for(var k in assoc){
     for(var i = 0; i < assoc[k]; i ++){
-      ret.push(k);
+      ret.push([k, assoc[k]]);
     }
   }
   return ret;
@@ -83,32 +83,46 @@ function generate(){
   var output = "";
   var count = 0;
   var tmp;
+  var rawScore = 0;
+  var cost = 0;
+  var dtext = "";
   while(ch != "$"){
     count ++;
     if(count > 100)break;
-    if(preCh == ""){
-      ch = nextChar(ch);
+    if(preCh == "" || Math.random()>0.4){
+      tmp = nextChar(ch);
+      ch = tmp[0];
+      cost = tmp[1];
     }else{
       tmp = nextChar2(ch, preCh);
       if(tmp == null){
         console.log("2")
-        ch = nextChar(ch);
+        tmp = nextChar(ch);
+        ch = tmp[0]
+        cost = tmp[1];
       }else{
         console.log("1")
-        ch = tmp;
+        ch = tmp[0];
+        cost = tmp[1];
       }
     }
   
     if(ch != "$"){
       output += ch;
     }
+    dtext += ch;
+    dtext += cost+"-";
+    rawScore += cost;
     preCh = ch;
   }
   
   console.log(output);
   //output = "「"+output+"」";
   return {
-    text: output
+    text: output,
+    dtext: dtext,
+    rawScore: rawScore,
+    score: rawScore/count,
   };
 }
 
@@ -116,17 +130,17 @@ var titleElm = document.getElementById("title");
 var items = [];
 var results = [];
 
-for(var i = 0; i < 30; i ++){
+for(var i = 0; i < 50; i ++){
   items.push(generate());
 }
 items.forEach(function(v){
   var score = 0;
 
   animeTitles.forEach(function(title){
-    if(v.text.indexOf(title) != -1){
+    if(v.text.indexOf(title) != -1){ // target include title?
       score += 10;
     }
-    if(title.indexOf(v.text) != -1){
+    if(title.indexOf(v.text) != -1){ // title include target?
       score += 10;
     }
   });
@@ -148,9 +162,41 @@ items.forEach(function(v){
   score += unbalance("〔","〕")?100:0;
   score += unbalance( "(", ")")?100:0;
   score += unbalance( "[", "]")?100:0;
+  score += unbalance( "【", "】")?100:0;
+
+  function katakana(s){
+    var count = 0;
+    var ret = true;
+    var c;
+    for(var i = 0; i < s.length; i ++){
+      c = s.charAt(i);
+      if(c.search(/[ァ-ヴー・]/) == 0){
+        count ++;
+      }else{
+        if(count == 1){
+          ret = false;
+        }
+        count = 0;
+      }
+    }
+    if(count == 1){ret = false;}
+    return ret;
+  }
+  score += katakana(v.text)?0:10;
+
+  if(v.text.search(/^[a-zA-Z.!?！？]*$/) == 0){
+    score += 10;
+  }
+
+  if(v.text.search(/[ぁ-ん]{6}/) != -1){
+    score += 10;
+  }
+  if(v.text.search(/[ァ-ヴ]{6}/) != -1){
+    score += 10;
+  }
 
   // length check
-  if(v.text.length < 3){
+  if(v.text.length < 5){
     score += 10;
   }
   if(v.text.length > 10){
@@ -159,16 +205,18 @@ items.forEach(function(v){
   
   results.push({
     score: score,
-    text: v.text
+    text: v.text,
+    dtext: v.dtext,
+    pscore: v.score
   });
 });
 
-results.sort(function(a,b){return a.score - b.score;});
+results.sort(function(a,b){return b.pscore - a.pscore;});
 results.forEach(function (v){
   if(v.score > 0){
     return;
   }
-  titleElm.appendChild(document.createTextNode(v.text));
+  titleElm.appendChild(document.createTextNode(v.text/*+":"+ v.dtext +", "+ v.pscore*/));
   var a;
   titleElm.appendChild(a = document.createElement("a"));
   a.appendChild(document.createTextNode("[つぶやく]"));
