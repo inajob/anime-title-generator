@@ -3,7 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="utf-8">
-<title>anime title generator</title>
+<title>アニメタイトル生成器</title>
 <title>Template</title>
 <!--[if IE]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -20,17 +20,57 @@
     background-color:#ddf;
   }
   .pad{
+    padding-left:1em;
+    padding-right:1em;
+  }
+  button{
+    border:solid;
     padding:2em;
+    background-color:#ddd;
+    font-size:1.2em;
+  }
+  .red{
+    background-color:#fdd;
+  }
+  .title{
+    background-color:white;
+    padding:1em;
+  }
+  #title{
+    margin-left:0.5em;
+  }
+  .title a {
+    font-size: small;
+    margin-left:1em;
+  }
+  .tar{
+    text-align:right;
   }
 </style>
 
 </head>
 <body>
+<script src="../mh/mh.js"></script>
 <div class="pad">
-  <h1>アニメタイトルジェネレータ</h1>
-  <h2 id="title"></h2>
+  <h1>アニメタイトル生成器</h1>
+  <div>
+    歴代アニメの名前をもとに、新しいアニメのタイトルを作ります。
+  <div/>
+  <h2 class="title"><div id="title"></div></h2>
+  <a href=""><button>再生成</button></a>
 
   <hr/>
+</div>
+
+<div class="tar">
+  姉妹サービス：<a href="/zougo/" target="_blank">造語生産器</a>
+  <a href="http://inajob.github.io/futuota/html/" target="_blank">ふつおた生成器</a>
+</div>
+
+
+<div class="tar">
+  元ネタ：<a href="https://github.com/anilogia/animedb">animedb</a><br />
+  つくったひと：<a href="http://twitter.com/ina_ani" target="_blank">@ina_ani</a>
 </div>
 
 <script src="title.js"></script>
